@@ -121,7 +121,7 @@ fun JarvisScreen(viewModel: JarvisViewModel = viewModel()) {
                     .weight(0.4f),
                 contentAlignment = Alignment.Center
             ) {
-                ModernOrbComponent(state = orbState, amplitude = amplitude)
+                OrbComponent(state = orbState, amplitude = amplitude)
             }
 
             if (error != null) {
