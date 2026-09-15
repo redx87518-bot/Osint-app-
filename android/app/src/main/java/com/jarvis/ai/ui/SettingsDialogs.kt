@@ -5,10 +5,13 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 
 @Composable
 fun SettingsDialog(onDismiss: () -> Unit) {
-    var backendUrl by remember { mutableStateOf("") }
+    val backendUrlState = remember { mutableStateOf("") }
+    val backendUrl = backendUrlState.value
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -16,7 +19,7 @@ fun SettingsDialog(onDismiss: () -> Unit) {
         text = {
             OutlinedTextField(
                 value = backendUrl,
-                onValueChange = { backendUrl = it },
+                onValueChange = { backendUrlState.value = it },
                 label = { Text("Backend URL") }
             )
         },

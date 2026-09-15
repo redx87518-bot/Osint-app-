@@ -25,10 +25,14 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(onLoginSuccess: () -> Unit) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(false) }
-    var error by remember { mutableStateOf<String?>(null) }
+    val emailState = remember { mutableStateOf("") }
+    val email = emailState.value
+    val passwordState = remember { mutableStateOf("") }
+    val password = passwordState.value
+    val isLoadingState = remember { mutableStateOf(false) }
+    val isLoading = isLoadingState.value
+    val errorState = remember { mutableStateOf<String?>(null) }
+    val error = errorState.value
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
@@ -46,7 +50,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
 
         OutlinedTextField(
             value = email,
-            onValueChange = { email = it },
+            onValueChange = { emailState.value = it },
             label = { Text("Email") },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
@@ -54,29 +58,29 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
 
         OutlinedTextField(
             value = password,
-            onValueChange = { password = it },
+            onValueChange = { passwordState.value = it },
             label = { Text("Password") },
             modifier = Modifier.fillMaxWidth(),
             visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
         )
 
         if (error != null) {
-            Text(text = error!!, modifier = Modifier.padding(top = 8.dp))
+            Text(text = error, modifier = Modifier.padding(top = 8.dp))
         }
 
         Button(
             onClick = {
-                isLoading = true
-                error = null
+                isLoadingState.value = true
+                errorState.value = null
                 scope.launch {
                     try {
                         SupabaseManager.signIn(email, password)
                         onLoginSuccess()
                     } catch (e: Exception) {
-                        error = e.localizedMessage ?: "Login failed"
+                        errorState.value = e.localizedMessage ?: "Login failed"
                     } finally {
-                        isLoading = false
+                        isLoadingState.value = false
                     }
                 }
             },

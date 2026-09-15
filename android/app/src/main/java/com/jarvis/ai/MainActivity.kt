@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
                     }
 
                     if (isLoggedIn) {
-                        val viewModel: JarvisViewModel = viewModel()
+                        val viewModel = viewModel()
                         JarvisScreen(viewModel = viewModel)
                     } else {
                         LoginScreen(onLoginSuccess = { isLoggedIn = true })

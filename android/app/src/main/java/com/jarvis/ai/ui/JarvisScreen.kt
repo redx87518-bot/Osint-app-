@@ -18,16 +18,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.jarvis.ai.JarvisViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun JarvisScreen(viewModel: JarvisViewModel = viewModel()) {
-    val messages by viewModel.messages.collectAsState()
-    val orbState by viewModel.orbState.collectAsState()
-    val amplitude by viewModel.amplitude.collectAsState()
-    val inputText by viewModel.inputText.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-    val error by viewModel.error.collectAsState()
+    val messagesState = viewModel.messages.collectAsState()
+    val messages = messagesState.value
+    val orbState = viewModel.orbState.collectAsState().value
+    val amplitude = viewModel.amplitude.collectAsState().value
+    val inputTextState = viewModel.inputText.collectAsState()
+    val inputText = inputTextState.value
+    val isLoading = viewModel.isLoading.collectAsState().value
+    val errorState = viewModel.error.collectAsState()
+    val error = errorState.value
 
     var showSettings by remember { mutableStateOf(false) }
     var showMemory by remember { mutableStateOf(false) }
@@ -65,7 +69,7 @@ fun JarvisScreen(viewModel: JarvisViewModel = viewModel()) {
 
             if (error != null) {
                 Text(
-                    text = error!!,
+                    text = error,
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
