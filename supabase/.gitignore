@@ -1,0 +1,5 @@
+# Local Supabase config may contain secrets
+.supabase/
+.env
+.env.*
+*.local
