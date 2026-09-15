@@ -24,6 +24,7 @@ jobs:
         with:
           api-level: 34
           build-tools: '34.0.0'
+          cmdline-tools: latest
 
       - name: Decode Keystore
         run: |
