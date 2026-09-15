@@ -1,6 +1,10 @@
 package com.jarvis.ai.ui
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -14,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -220,58 +225,6 @@ fun ModernMessageBubble(message: MessageItem) {
                 modifier = Modifier.padding(12.dp),
                 color = Color.White,
                 fontSize = 14.sp
-            )
-        }
-    }
-}
-
-@Composable
-fun ModernOrbComponent(state: OrbState, amplitude: Float) {
-    val infiniteTransition = rememberInfiniteTransition(label = "orb")
-    val animatedRadius by infiniteTransition.animateFloat(
-        initialValue = 80f,
-        targetValue = 100f,
-        animationSpec = infiniteRepeatable(tween(2000), RepeatMode.Reverse),
-        label = "radius"
-    )
-
-    val glowColor = when (state) {
-        OrbState.LISTENING -> Color(0xFF00E5FF)
-        OrbState.SPEAKING -> Color(0xFF00E676)
-        OrbState.PROCESSING -> Color(0xFFFFD740)
-        OrbState.IDLE -> Color(0xFF1A237E)
-    }
-
-    Box(
-        modifier = Modifier.size(200.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Canvas(modifier = Modifier.size(200.dp)) {
-            val center = Offset(size.width / 2, size.height / 2)
-            val radius = animatedRadius + amplitude * 20
-
-            drawCircle(
-                brush = Brush.radialGradient(
-                    colors = listOf(glowColor.copy(alpha = 0.6f), Color.Transparent),
-                    center = center,
-                    radius = radius * 1.5f
-                ),
-                center = center,
-                radius = radius * 1.5f
-            )
-
-            drawCircle(
-                color = glowColor.copy(alpha = 0.3f),
-                center = center,
-                radius = radius * 1.2f,
-                style = Stroke(width = 2.dp.toPx())
-            )
-
-            drawCircle(
-                color = glowColor,
-                center = center,
-                radius = radius * 0.8f,
-                style = Stroke(width = 4.dp.toPx())
             )
         }
     }

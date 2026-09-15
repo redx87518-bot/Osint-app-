@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.CoroutineScope
@@ -76,9 +77,12 @@ fun MemoryDialog(onDismiss: () -> Unit) {
 
 @Composable
 fun WhatsAppDialog(onDismiss: () -> Unit) {
-    var phoneNumber by remember { mutableStateOf("") }
-    var status by remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(false) }
+    val phoneNumberState = remember { mutableStateOf("") }
+    val phoneNumber = phoneNumberState.value
+    val statusState = remember { mutableStateOf("") }
+    val status = statusState.value
+    val isLoadingState = remember { mutableStateOf(false) }
+    val isLoading = isLoadingState.value
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -102,7 +106,7 @@ fun WhatsAppDialog(onDismiss: () -> Unit) {
 
                 OutlinedTextField(
                     value = phoneNumber,
-                    onValueChange = { phoneNumber = it },
+                    onValueChange = { phoneNumberState.value = it },
                     label = { Text("Phone Number") },
                     placeholder = { Text("+1234567890") },
                     modifier = Modifier.fillMaxWidth(),
@@ -138,17 +142,17 @@ fun WhatsAppDialog(onDismiss: () -> Unit) {
             TextButton(
                 onClick = {
                     if (phoneNumber.isBlank()) {
-                        status = "Please enter a phone number"
+                        statusState.value = "Please enter a phone number"
                         return@TextButton
                     }
 
-                    isLoading = true
-                    status = "Linking WhatsApp..."
+                    isLoadingState.value = true
+                    statusState.value = "Linking WhatsApp..."
 
                     CoroutineScope(Dispatchers.Main).launch {
                         delay(2000)
-                        status = "WhatsApp linked successfully! You can now chat with Jarvis via WhatsApp."
-                        isLoading = false
+                        statusState.value = "WhatsApp linked successfully! You can now chat with Jarvis via WhatsApp."
+                        isLoadingState.value = false
                     }
                 },
                 enabled = !isLoading
