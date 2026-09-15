@@ -61,11 +61,6 @@ dependencies {
     implementation("androidx.media:media:1.6.0")
     implementation("androidx.media3:media3-exoplayer:1.1.1")
 
-    implementation("io.github.jan.supabase:supabase-kt:2.0.0")
-    implementation("io.github.jan.supabase:supabase-auth-kt:2.0.0")
-    implementation("io.github.jan.supabase:supabase-storage-kt:2.0.0")
-    implementation("io.ktor:ktor-client-android:2.3.8")
-
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
