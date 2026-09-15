@@ -31,13 +31,15 @@ jobs:
           yes | sdkmanager --sdk_root=${ANDROID_HOME} "platform-tools" "platforms;android-34" "build-tools;34.0.0"
           yes | sdkmanager --sdk_root=${ANDROID_HOME} --licenses
 
-      - name: Grant gradlew execute permission
-        working-directory: android
-        run: chmod +x gradlew
+      - name: Install Gradle
+        run: |
+          wget -q https://services.gradle.org/distributions/gradle-8.2-bin.zip -O /tmp/gradle-8.2-bin.zip
+          unzip -q /tmp/gradle-8.2-bin.zip -d /opt/gradle
+          echo "/opt/gradle/gradle-8.2/bin" >> $GITHUB_PATH
 
       - name: Build with Gradle
         working-directory: android
-        run: ./gradlew assembleDebug --no-daemon --stacktrace
+        run: gradle assembleDebug --no-daemon --stacktrace
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
