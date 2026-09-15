@@ -3,6 +3,7 @@ pluginManagement {
         google()
         mavenCentral()
         gradlePluginPortal()
+        maven { url = uri("https://github.com/jan-tennert/supabase/raw/master/releases") }
     }
 }
 
