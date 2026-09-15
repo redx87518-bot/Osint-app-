@@ -58,7 +58,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
             label = { Text("Password") },
             modifier = Modifier.fillMaxWidth(),
             visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
         )
 
         if (error != null) {

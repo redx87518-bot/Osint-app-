@@ -2,9 +2,9 @@ package com.jarvis.ai.supabase
 
 import android.content.Context
 import android.util.Log
-import io.supabase.android.supabase
-import io.supabase.android.auth.Auth
-import io.supabase.android.storage.Storage
+import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.storage.Storage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,6 +15,7 @@ object SupabaseManager {
     private const val SUPABASE_ANON_KEY = "sb_publishable_8ES2xILHwJ2o9ejn6k26pw_L8EqK0ND"
 
     private var initialized = false
+    private var supabase: io.github.jan.supabase.SupabaseClient? = null
 
     private val _isLoggedIn = MutableStateFlow(false)
     val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
@@ -23,7 +24,10 @@ object SupabaseManager {
         if (initialized) return
 
         try {
-            supabase.create(SUPABASE_URL, SUPABASE_ANON_KEY)
+            supabase = createSupabaseClient(SUPABASE_URL, SUPABASE_ANON_KEY) {
+                install(Auth)
+                install(Storage)
+            }
             initialized = true
             Log.d(TAG, "Supabase initialized")
         } catch (e: Exception) {
@@ -33,7 +37,10 @@ object SupabaseManager {
 
     suspend fun signIn(email: String, password: String): Result<Unit> {
         return try {
-            val result = Auth.signInWithPassword(email, password)
+            supabase?.auth?.signInWith(io.github.jan.supabase.auth.providers.builtin.Email) {
+                this.email = email
+                this.password = password
+            }
             _isLoggedIn.value = true
             Result.success(Unit)
         } catch (e: Exception) {
@@ -44,7 +51,10 @@ object SupabaseManager {
 
     suspend fun signUp(email: String, password: String): Result<Unit> {
         return try {
-            val result = Auth.signUp(email, password)
+            supabase?.auth?.signUpWith(io.github.jan.supabase.auth.providers.builtin.Email) {
+                this.email = email
+                this.password = password
+            }
             _isLoggedIn.value = true
             Result.success(Unit)
         } catch (e: Exception) {
@@ -55,21 +65,21 @@ object SupabaseManager {
 
     fun signOut() {
         try {
-            Auth.signOut()
+            supabase?.auth?.signOut()
             _isLoggedIn.value = false
         } catch (e: Exception) {
             Log.e(TAG, "Sign out failed", e)
         }
     }
 
-    fun getCurrentUser() = Auth.currentUser
+    fun getCurrentUser() = supabase?.auth?.currentUserOrNull()
 
-    fun getAccessToken(): String? = Auth.currentSession?.accessToken
+    fun getAccessToken(): String? = supabase?.auth?.currentSessionOrNull()?.accessToken
 
     suspend fun uploadAudio(file: java.io.File, path: String): Result<String> {
         return try {
-            val storage = Storage["audio"]
-            storage.upload(path, file)
+            val storage = supabase?.storage?.get("audio")
+            storage?.upload(path, file)
             val url = "$SUPABASE_URL/storage/v1/object/public/audio/$path"
             Result.success(url)
         } catch (e: Exception) {
