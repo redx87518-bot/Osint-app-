@@ -14,7 +14,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.jarvis.ai.audio.AudioPlayer
 import com.jarvis.ai.supabase.SupabaseManager
 import com.jarvis.ai.ui.JarvisScreen
 import com.jarvis.ai.ui.LoginScreen
@@ -24,7 +23,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         SupabaseManager.init(applicationContext)
-        AudioPlayer.init(applicationContext)
 
         setContent {
             JarvisTheme {

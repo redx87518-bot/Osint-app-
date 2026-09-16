@@ -39,15 +39,17 @@ interface JarvisApi {
 
     @DELETE("api/memory/{id}")
     suspend fun deleteMemory(@Header("Authorization") token: String, @Path("id") id: String): DeleteResponse
+}
 
-    @GET("api/whatsapp/status")
-    suspend fun whatsappStatus(@Header("Authorization") token: String): WhatsAppStatusResponse
+interface WhatsAppApi {
+    @POST("whatsapp-connect")
+    suspend fun connect(@Header("Authorization") token: String, @Body body: Map<String, Any?>): WhatsAppConnectResponse
 
-    @POST("api/whatsapp/pair")
-    suspend fun whatsappPair(@Header("Authorization") token: String): WhatsAppPairResponse
+    @GET("whatsapp-status")
+    suspend fun status(@Header("Authorization") token: String): WhatsAppStatusResponse
 
-    @POST("api/whatsapp/send")
-    suspend fun whatsappSend(@Header("Authorization") token: String, @Body body: Map<String, String>): WhatsAppSendResponse
+    @POST("whatsapp-send")
+    suspend fun send(@Header("Authorization") token: String, @Body body: Map<String, String>): WhatsAppSendResponse
 }
 
 data class HealthResponse(val status: String, val timestamp: String)
@@ -57,31 +59,53 @@ data class SaveResponse(val ok: Boolean)
 data class MemoryResponse(val memories: Map<String, Any?>)
 data class SaveMemoryResponse(val memory: Map<String, Any?>)
 data class DeleteResponse(val ok: Boolean)
-data class WhatsAppStatusResponse(val connected: Boolean, val phone: String? = null)
-data class WhatsAppPairResponse(val message: String)
-data class WhatsAppSendResponse(val messageId: String? = null, val status: String)
+
+data class WhatsAppConnectResponse(
+    val status: String? = null,
+    val message: String? = null,
+    val pairing_code: String? = null,
+    val expires_in: Int? = null,
+    val connection: Map<String, Any?>? = null
+)
+
+data class WhatsAppStatusResponse(
+    val status: String? = null,
+    val connected: Boolean = false,
+    val phone: String? = null,
+    val device_id: String? = null,
+    val provider_status: String? = null,
+    val last_connected: String? = null,
+    val last_seen: String? = null
+)
+
+data class WhatsAppSendResponse(
+    val messageId: String? = null,
+    val status: String
+)
 
 object ApiClient {
     private const val DEFAULT_BASE_URL = "http://10.0.2.2:8080/"
+    private const val SUPABASE_URL = "https://jklnlcrzpumcgezwkucb.supabase.co/functions/v1/"
 
-    fun create(baseUrl: String = BuildConfig.BACKEND_URL.ifEmpty { DEFAULT_BASE_URL }): JarvisApi {
-        val logging = HttpLoggingInterceptor().apply {
-            level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
-        }
-
-        val authInterceptor = Interceptor { chain ->
-            val token = SupabaseManager.getAccessToken() ?: ""
-            val request = chain.request().newBuilder()
-                .addHeader("Authorization", "Bearer $token")
-                .build()
-            chain.proceed(request)
-        }
-
-        val client = OkHttpClient.Builder()
-            .addInterceptor(authInterceptor)
-            .addInterceptor(logging)
+    private val authInterceptor = Interceptor { chain ->
+        val token = SupabaseManager.getAccessToken() ?: ""
+        val request = chain.request().newBuilder()
+            .addHeader("Authorization", "Bearer $token")
+            .addHeader("apikey", "sb_publishable_8ES2xILHwJ2o9ejn6k26pw_L8EqK0ND")
             .build()
+        chain.proceed(request)
+    }
 
+    private val logging = HttpLoggingInterceptor().apply {
+        level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
+    }
+
+    private val client = OkHttpClient.Builder()
+        .addInterceptor(authInterceptor)
+        .addInterceptor(logging)
+        .build()
+
+    fun createJarvisApi(baseUrl: String = BuildConfig.BACKEND_URL.ifEmpty { DEFAULT_BASE_URL }): JarvisApi {
         return Retrofit.Builder()
             .baseUrl(baseUrl)
             .client(client)
@@ -89,4 +113,14 @@ object ApiClient {
             .build()
             .create(JarvisApi::class.java)
     }
+
+    fun createWhatsAppApi(): WhatsAppApi {
+        return Retrofit.Builder()
+            .baseUrl(SUPABASE_URL)
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(WhatsAppApi::class.java)
+    }
 }
+
